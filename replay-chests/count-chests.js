@@ -9,6 +9,8 @@
  * Pouziti:
  *   node count-chests.js                              # hleda Plocha\data, pak Demos
  *   node count-chests.js "C:\cesta\k\replayum"
+ *   node count-chests.js a.replay b.replay ...        # jen vybrane soubory
+ *   (nebo oznac replaye v Pruzkumniku a pretahni je mysi na spustit.bat)
  *   node count-chests.js --do "2026-11-17 13:50"      # jen truhly otevrene pred timto casem
  *   node count-chests.js --od 2026-11-01 --do "2026-11-17 13:50"
  *   node count-chests.js --ja MojeJmeno               # kdyz se "ty" neurci samo
@@ -24,7 +26,7 @@ const basePlayerState = require('fortnite-replay-parser/NetFieldExports/FortPlay
 // ------------------------------------------------------------------ argumenty
 
 function parseArgs(argv) {
-  const opts = { dir: null, od: null, do: null, ja: null, detail: false };
+  const opts = { paths: [], od: null, do: null, ja: null, detail: false };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     if (a === '--od') opts.od = parseDate(argv[++i], '--od');
@@ -34,7 +36,7 @@ function parseArgs(argv) {
     else if (a === '-h' || a === '--help') {
       console.log(fs.readFileSync(__filename, 'utf8').split('*/')[0]);
       process.exit(0);
-    } else opts.dir = a;
+    } else opts.paths.push(a);
   }
   return opts;
 }
@@ -185,15 +187,21 @@ const fmt = (d) => (d ? d.toLocaleString('cs-CZ') : '?');
 async function main() {
   const opts = parseArgs(process.argv.slice(2));
 
-  let dir = opts.dir;
-  if (!dir) {
-    dir = candidateDirs().find((d) => fs.existsSync(d) && findReplays(d).length);
+  let paths = opts.paths;
+  if (!paths.length) {
+    const dir = candidateDirs().find((d) => fs.existsSync(d) && findReplays(d).length);
     if (!dir) fail('Nenasel jsem zadne .replay soubory. Zadej cestu: node count-chests.js "C:\\cesta\\ke\\slozce"');
+    paths = [dir];
   }
-  if (!fs.existsSync(dir)) fail(`Slozka ${dir} neexistuje.`);
-  const files = findReplays(dir).sort();
-  if (!files.length) fail(`Ve slozce ${dir} nejsou zadne .replay soubory.`);
-  console.log(`Slozka: ${dir}  (${files.length} replayu)`);
+  const files = [];
+  for (const p of paths) {
+    if (!fs.existsSync(p)) fail(`${p} neexistuje.`);
+    if (fs.statSync(p).isDirectory()) files.push(...findReplays(p));
+    else if (p.toLowerCase().endsWith('.replay')) files.push(p);
+  }
+  files.sort((x, y) => path.basename(x).localeCompare(path.basename(y)));
+  if (!files.length) fail(`V ${paths.join(', ')} nejsou zadne .replay soubory.`);
+  console.log(`Replayu: ${files.length}  (${path.basename(files[0])} ... ${path.basename(files[files.length - 1])})`);
   if (opts.od) console.log(`Od: ${fmt(opts.od)}`);
   if (opts.do) console.log(`Do: ${fmt(opts.do)}`);
   console.log('');

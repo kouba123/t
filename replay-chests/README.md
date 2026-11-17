@@ -10,6 +10,8 @@ Všechno běží jen u tebe na počítači.
 3. Dvakrát klikni na `spustit.bat`.
 4. Zeptá se, do kdy počítat. Napiš třeba `2026-11-17 13:50` (nebo jen Enter = všechno).
 
+**Jen vybrané replaye:** označ je v Průzkumníku a přetáhni myší na `spustit.bat`.
+
 Replaye hledá automaticky v `Plocha\data` (i na OneDrivu), jinak v
 `%LOCALAPPDATA%\FortniteGame\Saved\Demos`.
 
