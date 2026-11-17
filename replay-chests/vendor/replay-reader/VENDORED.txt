@@ -1,0 +1,2 @@
+upstream: https://github.com/xNocken/replay-reader @ 7da45e4aa7fb58d33421d79d66c2136603a50ab4 (MIT)
+patched: export/propertyExport/handlePlayerState.js (spectator list per replay)

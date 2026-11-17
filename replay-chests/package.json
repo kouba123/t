@@ -1,0 +1,13 @@
+{
+  "name": "replay-chests",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Spocita otevrene truhly z Fortnite replayu",
+  "main": "count-chests.js",
+  "scripts": {
+    "start": "node count-chests.js"
+  },
+  "dependencies": {
+    "fortnite-replay-parser": "file:vendor/replay-reader"
+  }
+}
